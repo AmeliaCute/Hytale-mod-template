@@ -1,0 +1,38 @@
+{
+  "Type": "Charging",
+  "Effects": {
+    "ItemAnimationId": "CastHurlCharging",
+    "WorldSoundEventId": "SFX_Divine_Respawn",
+    "FirstPersonParticles": [
+      {
+        "SystemId": "Teleport",
+        "Scale": 0.05,
+        "PositionOffset": {
+          "Y": -0.25,
+          "X": 0.5,
+          "Z": 0
+        },
+        "RotationOffset": {
+          "Yaw": 0
+        },
+        "DetachedFromModel": false
+      }
+    ]
+  },
+  "AllowIndefiniteHold": true,
+  "HorizontalSpeedMultiplier": 0.8,
+  "Next": {
+    "0": {
+      "Type": "Chaining",
+      "ChainingAllowance": 1.25,
+      "Next": [
+        "Block_Swing_Left",
+        "Block_Swing_Right",
+        "Block_Swing_Down"
+      ],
+      "Effects": {},
+      "Tags": {}
+    },
+    "0.25": "FunnyBook_Cast_Launchh"
+  }
+}

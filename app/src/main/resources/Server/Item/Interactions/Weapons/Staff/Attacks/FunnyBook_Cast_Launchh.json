@@ -1,0 +1,9 @@
+{
+  "Type": "LaunchProjectile",
+  "RunTime": 0,
+  "Effects": {
+    "ItemAnimationId": "CastSummonCharged"
+  },
+  "ProjectileId": "Ice_Bolt",
+  "Next": "Spellbook_Cast_Hurl_Charged"
+}
