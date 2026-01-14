@@ -1,15 +1,15 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.funnybook.name"
+    "Name": "Funny book :3"
   },
   "Categories": [
     "Items.Weapons"
   ],
-  "Icon": "Icons/ItemsGenerated/Weapon_Spellbook_Grimoire_Purple.png",
+  "Icon": "Icons/ItemsGenerated/Weapon_Spellbook_FunnyBook.png",
   "Quality": "Legendary",
   "ItemLevel": 1024,
   "Model": "Items/Weapons/Spellbook/Grimoire.blockymodel",
-  "Texture": "Items/Weapons/Spellbook/Grimoire_Purple_Texture.png",
+  "Texture": "Items/Weapons/Spellbook/FunnyBook_Texture.png",
   "PlayerAnimationsId": "Spellbook",
   "IconProperties": {
     "Scale": 0.745,
@@ -68,9 +68,5 @@
     ]
   },
   "Weapon": {},
-  "ItemSoundSetId": "ISS_Weapons_Books",
-  "Light": {
-    "Color": "#421",
-    "Radius": 30
-  }
+  "ItemSoundSetId": "ISS_Weapons_Books"
 }
