@@ -27,14 +27,14 @@ public class Plugin extends JavaPlugin {
         Preconditions.checkNotNull(init, "JavaPluginInit cannot be null");
         super(init);
         instance = this;
-        logger.atInfo().log("[Demo Plugin] Plugin loaded 2!");
+        logger.atInfo().log("Plugin loaded!");
     }
 
     /**
      * Called when plugin is enabled.
      */
     public void onEnable() {
-        logger.atInfo().log("[Demo Plugin] Plugin enabled!");
+        logger.atInfo().log("Plugin enabled!");
 
         // TODO: Initialize your plugin here
         // - Load configuration
@@ -47,7 +47,7 @@ public class Plugin extends JavaPlugin {
      * Called when plugin is disabled.
      */
     public void onDisable() {
-        logger.atInfo().log("[Demo Plugin] Plugin disabled!");
+        logger.atInfo().log("Plugin disabled!");
 
         // TODO: Cleanup your plugin here
         // - Save data
