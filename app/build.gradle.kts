@@ -60,8 +60,8 @@ tasks {
             if (missingFiles.isNotEmpty()) {
                 throw GradleException(
                     "ERROR: The following required files are missing in ./libs/:\n" +
-                            missingFiles.joinToString("\n") { "  - $it" } +
-                            "\n\nPlease read ./libs/README.md for instructions on how to obtain these files."
+                    missingFiles.joinToString("\n") { "  - $it" } +
+                    "\n\nPlease read README.md for instructions on how to obtain these files."
                 )
             }
         }

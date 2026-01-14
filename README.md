@@ -1,111 +1,53 @@
 # Hytale Plugin Development Template
 
 A simple Hytale plugin development template built with Gradle (Kotlin DSL) and Java 25.
+> Enhanced Fork: this project is an improved fork of the [original template](https://github.com/CodyAdam/hytale-plugin-template) from CodyAdam. with additional features for easier development and server execution.
 
-## ✨ Features
+#### WHAT'S NEW IN THIS FORK?????
+- Gradle `runServer` task: no python dependency, pure gradle workflow 🤡
 
-- **VS Code Java Extension Pack Compatible** - Full IntelliSense, debugging, and code navigation support
-- **Automatic Server Running** - Run your plugin with the Hytale server directly using a single command
-- **Modern Build System** - Gradle with Kotlin DSL for type-safe, maintainable builds, shadowJar for easy distribution
-- **Minimalist & Simple** - Clean project structure without unnecessary complexity
-- **Java 25** - Built with the latest Java features and toolchain
-- **Hot Reload Ready** - Quick iteration with automatic builds and server restarts
+### Prerequisites:
+- JDK 25 (Adoptium, Temurin, whatever you want i dont care)
+- Hytale Server Files (Place `HytaleServer.jar` and `Assets.zip` in the `libs/` folder or do a symlink)
 
-## Prerequisites
+### Quick start
 
-- **Java Development Kit (JDK) 25** or higher
-- **Python 3** (for running the server)
-- **Hytale Server JAR and Assets** - Place `HytaleServer.jar` and `Assets.zip` in the `libs/` folder (see [libs/README.md](./libs/README.md))
+#### 1. Get the server files
+You need to place `HytaleServer.jar` and `Assets.zip` in the `libs/` folder 
 
-## Quick Start
+*Best for quick testing*: you'll need to recopy when udates drop:
+Default locations:
 
-1. **Get the server files** - Place `HytaleServer.jar` and `Assets.zip` in the `libs/` folder
-2. **Build your plugin:**
+**Windows**: `%appdata%\Hytale\install\release\package\game\latest`
+**Linux**: `$XDG_DATA_HOME/Hytale/install/release/package/game/latest`
+**MacOS**: `~/Application Support/Hytale/install/release/package/game/latest`
 
-   ```bash
-   ./gradlew build
-   ```
+Copy `HytaleServer.jar` and `Assets.zip` to the `libs/` folder.
 
-   The JAR will be created at `app/build/libs/`
-
-3. **Run the server with your plugin:**
-   ```bash
-   ./run.py
-   ```
-   This automatically builds your plugin and starts the Hytale server.
-
-## Commands
-
-### Build Plugin
-
+#### 2. Build your plugin
 ```bash
-./gradlew build
+$ ./gradlew build
 ```
 
-Builds your plugin JAR to `app/build/libs/`
+JAR output: `app/build/libs/`
 
-### Clean Build
-
+#### 3. Run the server
 ```bash
-./gradlew clean
+$ ./gradlew runServer
 ```
 
-Removes all build artifacts and the `run/` directory.
+##### This automatically
+- Verifies required files exist
+- Sets up the `run/` folder
+- Builds your plugin
+- Copies it to `run/mods` 
+- Start the server
 
-### Run Server
+### Customization
 
-```bash
-./run.py
-```
-
-Builds your plugin and starts the Hytale server with your plugin loaded.
-
-## Recommended Project Structure
-
-```
-src/main/java/com/yourname/yourplugin/
-├── Plugin.java          # Main plugin class
-├── commands/            # Command handlers
-├── listeners/           # Event listeners
-├── services/            # Business logic
-├── storage/             # Data persistence
-├── config/              # Configuration
-└── utils/               # Utility classes
-```
-
-## Customization
-
-### Update Package Name
-
-1. Rename `app/src/main/java/com/example/demo/` to your package path
-2. Update the package declaration in `Plugin.java`
+#### Update package name
+1. Rename `com.example.demo` (inside `app/src/main/java`) to you package path
+2. Update package declaration in `Plugin.java`
 3. Update `Main` field in `app/src/main/resources/manifest.json`
-4. Update `pluginGroup` in `gradle.properties`
+4. Update `pluginGroup` inside `gradle.properties`
 
-### Update Plugin Metadata
-
-Edit `app/src/main/resources/manifest.json` to set your plugin name, version, description, etc.
-
-## Building for Production
-
-1. Update version in `app/build.gradle.kts`:
-
-   ```kotlin
-   version = "1.0.0"
-   ```
-
-2. Build the JAR:
-
-   ```bash
-   ./gradlew build
-   ```
-
-3. Find your plugin at `app/build/libs/YourPluginName-1.0.0.jar`
-
-## Troubleshooting
-
-- **Build errors:** Ensure you have JDK 25 installed
-- **Server won't start:** Check that `HytaleServer.jar` and `Assets.zip` are in `libs/` folder
-- **Python not found:** Ensure Python 3 is installed and in your PATH
-- **Java Runtime version mismatch:** Ensure you have JDK 25 installed and configured, run `> Java: Configure 
-Java Runtime` to set to JDK 25.

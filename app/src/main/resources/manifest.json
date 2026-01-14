@@ -1,17 +1,17 @@
 {
   "Group": "Example",
-  "Name": "DemoPlugin",
+  "Name": "Template",
   "Version": "1.0.0",
   "Description": "A Hytale demo plugin template",
   "Authors": [
     {
-      "Name": "Cody Adam",
-      "Email": "hi@codya.dev",
-      "Url": "https://codya.dev"
+      "Name": "Love",
+      "Email": "mail@example.com",
+      "Url": "https://example.com"
     }
   ],
   "Website": "https://github.com/codyadam/hytale-plugin-template",
-  "Main": "xyz.amycute.Plugin",
+  "Main": "net.example.ExamplePlugin",
   "ServerVersion": "*",
   "Dependencies": {},
   "OptionalDependencies": {},
