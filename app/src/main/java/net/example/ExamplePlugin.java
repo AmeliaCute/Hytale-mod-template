@@ -3,10 +3,12 @@
  */
 package net.example;
 
+import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.logger.HytaleLogger;
-import net.example.Commands.ExampleCommand;
+import net.example.Commands.ItemCommand;
+import net.example.Events.ExampleEvent;
 
 /**
  * Main plugin class.
@@ -19,7 +21,7 @@ public class ExamplePlugin extends JavaPlugin {
     /**
      * Constructor - Called when plugin is loaded.
      * Ensures that the JavaPluginInit reference is not null.
-     * 
+     *
      * @param init the plugin initialization object (must not be null)
      * @throws NullPointerException if init is null
      */
@@ -29,38 +31,21 @@ public class ExamplePlugin extends JavaPlugin {
         logger.atInfo().log("Plugin loaded!");
     }
 
-    /**
-     * Called when plugin is enabled.
-     */
+
     @Override
     public void setup() {
         logger.atInfo().log("Plugin enabled! test4444");
-
-        this.getCommandRegistry().registerCommand(new ExampleCommand());
-
-        // TODO: Initialize your plugin here
-        // - Load configuration
-        // - Register event listeners
-        // - Register commands
-        // - Start services
+        this.getCommandRegistry().registerCommand(new ItemCommand());
+        this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, ExampleEvent::onPlayerReady);
     }
 
-    /**
-     * Called when plugin is disabled.
-     */
+
     @Override
     public void shutdown() {
         logger.atInfo().log("Plugin disabled!");
-
-        // TODO: Cleanup your plugin here
-        // - Save data
-        // - Stop services
-        // - Close connections
     }
 
-    /**
-     * Get plugin instance.
-     */
+
     public static ExamplePlugin getInstance() {
         return instance;
     }
