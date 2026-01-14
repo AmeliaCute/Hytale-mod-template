@@ -7,6 +7,7 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.entity.entities.player.data.PlayerConfigData;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -14,9 +15,9 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
 
-public class ExampleCommand extends AbstractPlayerCommand {
-    public ExampleCommand() {
-        super("test", "Super test command!");
+public class ItemCommand extends AbstractPlayerCommand {
+    public ItemCommand() {
+        super("item", "Super test command!");
     }
 
     @Override
@@ -26,7 +27,13 @@ public class ExampleCommand extends AbstractPlayerCommand {
                            @Nonnull PlayerRef playerRef,
                            @Nonnull World world) {
         Player player = store.getComponent(ref, Player.getComponentType());
-        ItemStack mainItem = player.getInventory().getItemInHand() ;
-        player.sendMessage(Message.parse(mainItem.toString()));
+        if (player != null ){
+            ItemStack mainItem = player.getInventory().getItemInHand() ;
+            if (mainItem != null ){
+                double maxDurability = mainItem.getMaxDurability();
+
+                player.sendMessage(Message.raw(mainItem.toString()));
+            }
+        }
     }
 }
