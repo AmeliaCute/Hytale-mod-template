@@ -1,0 +1,19 @@
+{
+  "Group": "Codya",
+  "Name": "TestPlugin",
+  "Version": "1.0.0",
+  "Description": "A Hytale plugin built for fun",
+  "Authors": [
+    {
+      "Name": "Cody Adam",
+      "Email": "hi@codya.dev",
+      "Url": "https://codya.dev"
+    }
+  ],
+  "Website": "https://github.com/codyadam/hytale-codya-plugin",
+  "Main": "com.example.demo.Plugin",
+  "ServerVersion": "*",
+  "Dependencies": {},
+  "OptionalDependencies": {},
+  "DisabledByDefault": false
+}
