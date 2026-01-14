@@ -1,8 +1,8 @@
 {
-  "Group": "Codya",
-  "Name": "TestPlugin",
+  "Group": "Example",
+  "Name": "DemoPlugin",
   "Version": "1.0.0",
-  "Description": "A Hytale plugin built for fun",
+  "Description": "A Hytale demo plugin template",
   "Authors": [
     {
       "Name": "Cody Adam",
@@ -10,7 +10,7 @@
       "Url": "https://codya.dev"
     }
   ],
-  "Website": "https://github.com/codyadam/hytale-codya-plugin",
+  "Website": "https://github.com/codyadam/hytale-plugin-template",
   "Main": "com.example.demo.Plugin",
   "ServerVersion": "*",
   "Dependencies": {},
