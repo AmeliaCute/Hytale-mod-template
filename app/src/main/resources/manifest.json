@@ -11,7 +11,7 @@
     }
   ],
   "Website": "https://github.com/codyadam/hytale-plugin-template",
-  "Main": "com.example.demo.Plugin",
+  "Main": "xyz.amycute.Plugin",
   "ServerVersion": "*",
   "Dependencies": {},
   "OptionalDependencies": {},
