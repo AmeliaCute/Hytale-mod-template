@@ -1,0 +1,177 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.Weapon_Club_Zombie_Sand_Leg.name"
+  },
+  "Categories": [
+    "Items.Weapons"
+  ],
+  "Quality": "Legendary",
+  "ItemLevel": 6969,
+  "Model": "Items/Weapons/Club/Zombie_Leg.blockymodel",
+  "PlayerAnimationsId": {
+    "Parent": "Club_Flail",
+    "Animations": {
+      "Guard": {
+        "ThirdPerson": "Characters/Animations/Items/Main_Handed/Sword/Attacks/Guard/Guard.blockyanim",
+        "ThirdPersonMoving": "Characters/Animations/Items/Main_Handed/Sword/Attacks/Guard/Guard_Moving.blockyanim",
+        "ThirdPersonFace": "Characters/Animations/Expressions/Frown.blockyanim",
+        "FirstPerson": "Characters/Animations/Items/Main_Handed/Sword/Attacks/Guard/Guard_FPS.blockyanim",
+        "KeepPreviousFirstPersonAnimation": true,
+        "Speed": 1,
+        "BlendingDuration": 0.1
+      },
+      "SpinSwingLeftCharging": {
+        "ThirdPerson": "Characters/Animations/Items/Main_Handed/Sword/Attacks/Swing_Left_Charged/Swing_Left_Charging.blockyanim",
+        "Looping": false,
+        "Speed": 0.18,
+        "ThirdPersonMoving": "Characters/Animations/Items/Main_Handed/Sword/Attacks/Swing_Left_Charged/Swing_Left_Charging_Moving.blockyanim",
+        "FirstPerson": "Characters/Animations/Items/Main_Handed/Sword/Attacks/Swing_Left_Charged/Swing_Left_Charging_FPS.blockyanim",
+        "ThirdPersonFace": "Characters/Animations/Expressions/Frown.blockyanim",
+        "KeepPreviousFirstPersonAnimation": true
+      }
+    }
+  },
+  "UsePlayerAnimations": true,
+  "Utility": {
+    "Compatible": true
+  },
+  "Interactions": {
+    "Primary": "Club_Flail_Attack"
+  },
+  "InteractionVars": {
+    "Club_Flail_Swing_Left_Effect": {
+      "Interactions": [
+        {
+          "Parent": "Club_Flail_Swing_Left_Effect",
+          "Effects": {
+            "WorldSoundEventId": "SFX_Light_Melee_T2_Swing",
+            "Trails": [
+              {
+                "TrailId": "Small_Default",
+                "RotationOffset": {
+                  "Yaw": 0,
+                  "Pitch": 45,
+                  "Roll": 30
+                },
+                "TargetNodeName": "Chain2",
+                "TargetEntityPart": "PrimaryItem"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "Club_Flail_Swing_Left_Damage": {
+      "Interactions": [
+        {
+          "Parent": "Club_Flail_Swing_Left_Damage",
+          "DamageCalculator": {
+            "Type": "Absolute",
+            "BaseDamage": {
+              "Physical": 7
+            },
+            "RandomPercentageModifier": 0.1
+          },
+          "DamageEffects": {
+            "WorldSoundEventId": "SFX_Club_Steel_Impact"
+          }
+        }
+      ]
+    },
+    "Club_Flail_Swing_Right_Effect": {
+      "Interactions": [
+        {
+          "Parent": "Club_Flail_Swing_Right_Effect",
+          "Effects": {
+            "WorldSoundEventId": "SFX_Light_Melee_T2_Swing",
+            "Trails": [
+              {
+                "TrailId": "Small_Default",
+                "RotationOffset": {
+                  "Yaw": 0,
+                  "Pitch": 45,
+                  "Roll": 30
+                },
+                "TargetNodeName": "Chain2",
+                "TargetEntityPart": "PrimaryItem"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "Club_Flail_Swing_Right_Damage": {
+      "Interactions": [
+        {
+          "Parent": "Club_Flail_Swing_Right_Damage",
+          "DamageCalculator": {
+            "Type": "Absolute",
+            "BaseDamage": {
+              "Physical": 7
+            },
+            "RandomPercentageModifier": 0.1
+          },
+          "DamageEffects": {
+            "WorldSoundEventId": "SFX_Club_Steel_Impact"
+          }
+        }
+      ]
+    },
+    "Club_Flail_Spin_Swing_Left_Charged_Effect": {
+      "Interactions": [
+        {
+          "Parent": "Club_Flail_Spin_Swing_Left_Charged_Effect",
+          "Effects": {
+            "WorldSoundEventId": "SFX_Light_Melee_T2_Swing",
+            "Trails": [
+              {
+                "TrailId": "Small_Charged",
+                "RotationOffset": {
+                  "Yaw": 0,
+                  "Pitch": 45,
+                  "Roll": 30
+                },
+                "TargetNodeName": "Chain2",
+                "TargetEntityPart": "PrimaryItem"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "Club_Flail_Spin_Swing_Left_Charged_Damage": {
+      "Interactions": [
+        {
+          "Parent": "Club_Flail_Spin_Swing_Left_Charged_Damage",
+          "DamageCalculator": {
+            "BaseDamage": {
+              "Physical": 16
+            }
+          },
+          "DamageEffects": {
+            "WorldSoundEventId": "SFX_Club_Wood_Impact"
+          }
+        }
+      ]
+    }
+  },
+  "IconProperties": {
+    "Scale": 0.6,
+    "Rotation": [
+      28.1,
+      69.8,
+      0.0
+    ],
+    "Translation": [
+      -14.4,
+      -24.6
+    ]
+  },
+  "Texture": "NPC/Undead/Zombie/Models/Zombie_Sand.png",
+  "Icon": "Icons/ItemsGenerated/Weapon_Club_Zombie_Sand_Leg.png",
+  "DroppedItemAnimation": "Items/Animations/Dropped/Dropped_Diagonal_Left.blockyanim",
+  "MaxDurability": 16,
+  "DurabilityLossOnHit": 0.56,
+  "Weapon": {},
+  "ItemSoundSetId": "ISS_Weapons_Blunt_Small"
+}
