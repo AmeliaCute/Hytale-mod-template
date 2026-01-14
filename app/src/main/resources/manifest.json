@@ -15,5 +15,8 @@
   "ServerVersion": "*",
   "Dependencies": {},
   "OptionalDependencies": {},
-  "DisabledByDefault": false
+  "LoadBefore": {},
+  "DisabledByDefault": false,
+  "IncludesAssetPack": true,
+  "SubPlugins": []
 }
