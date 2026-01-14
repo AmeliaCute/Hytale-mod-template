@@ -6,6 +6,7 @@ package com.example.demo;
 import com.google.common.base.Preconditions;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import com.hypixel.hytale.logger.HytaleLogger;
 
 /**
  * Main plugin class.
@@ -13,6 +14,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 public class Plugin extends JavaPlugin {
 
     private static Plugin instance;
+    private static final HytaleLogger logger = HytaleLogger.forEnclosingClass();
 
     /**
      * Constructor - Called when plugin is loaded.
@@ -25,14 +27,14 @@ public class Plugin extends JavaPlugin {
         Preconditions.checkNotNull(init, "JavaPluginInit cannot be null");
         super(init);
         instance = this;
-        System.out.println("[Demo Plugin] Plugin loaded!");
+        logger.atInfo().log("[Demo Plugin] Plugin loaded 2!");
     }
 
     /**
      * Called when plugin is enabled.
      */
     public void onEnable() {
-        System.out.println("[Demo Plugin] Plugin enabled!");
+        logger.atInfo().log("[Demo Plugin] Plugin enabled!");
 
         // TODO: Initialize your plugin here
         // - Load configuration
@@ -45,7 +47,7 @@ public class Plugin extends JavaPlugin {
      * Called when plugin is disabled.
      */
     public void onDisable() {
-        System.out.println("[Demo Plugin] Plugin disabled!");
+        logger.atInfo().log("[Demo Plugin] Plugin disabled!");
 
         // TODO: Cleanup your plugin here
         // - Save data

@@ -1,5 +1,6 @@
 plugins {
     id("java-library")
+    id("com.gradleup.shadow") version "9.3.1"
 }
 
 java {
@@ -19,14 +20,25 @@ repositories {
 dependencies {
     compileOnly(files("../libs/HytaleServer.jar"))
 
-    implementation(libs.guava)
+    implementation("com.google.guava:guava:33.4.6-jre")
 }
+tasks {
+    clean {
+        delete(rootProject.projectDir.resolve("run"))
+    }
 
-tasks.named<Jar>("jar") {
-    archiveBaseName.set(rootProject.name)
-    archiveVersion.set(project.version.toString())
-}
+    jar {
+        enabled = false
+    }
 
-tasks.named<Delete>("clean") {
-    delete(rootProject.projectDir.resolve("run"))
+    shadowJar {
+        archiveBaseName.set(rootProject.name)
+        archiveVersion.set(project.version.toString())
+        archiveClassifier.set("")
+        mergeServiceFiles()
+    }
+
+    build {
+        dependsOn(shadowJar)
+    }
 }

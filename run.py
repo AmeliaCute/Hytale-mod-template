@@ -45,8 +45,8 @@ def main():
         sys.exit(1)
 
     # Step 1: Build the latest jar using gradlew jar
-    print("Step 1: Building jar with gradlew jar...")
-    run_command(["./gradlew", "jar"])
+    print("Step 1: Building jar with gradlew build...")
+    run_command(["./gradlew", "build"])
 
     # Step 2: Ensure run folder exists
     print(f"\nStep 2: Ensuring run folder exists ({RUN_FOLDER})...")
