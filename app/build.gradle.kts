@@ -1,11 +1,9 @@
+import java.nio.file.Files
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     id("java-library")
     id("com.gradleup.shadow") version "9.3.1"
-}
-
-tasks.jar {
-    archiveBaseName.set(project.property("pluginName") as String)
-    archiveVersion.set(project.property("pluginVersion") as String)
 }
 
 java {
@@ -17,10 +15,6 @@ java {
 }
 
 version = "1.0.0"
-val serverPath = rootProject.file("libs/HytaleServer.jar")
-val assetsPath = rootProject.file("libs/Assets.zip")
-val runFolder = rootProject.file("run")
-val modsFolder = runFolder.resolve("mods")
 
 repositories {
     mavenCentral()
@@ -28,12 +22,13 @@ repositories {
 
 dependencies {
     compileOnly(files("../libs/HytaleServer.jar"))
-
     implementation("com.google.guava:guava:33.4.6-jre")
 }
+
 tasks {
     clean {
-        delete(rootProject.projectDir.resolve("run"))
+        delete(rootProject.file("run"))
+        delete(rootProject.file("build"))
     }
 
     jar {
@@ -41,72 +36,95 @@ tasks {
     }
 
     shadowJar {
-        archiveBaseName.set(rootProject.name)
-        archiveVersion.set(project.version.toString())
+        archiveBaseName.set(project.property("pluginName") as String)
+        archiveVersion.set(project.property("pluginVersion") as String)
         archiveClassifier.set("")
         mergeServiceFiles()
     }
 
-    build {
-        dependsOn(shadowJar)
+    val shadowJarTask = named<ShadowJar>("shadowJar")
+    val buildRelease by registering {
+        dependsOn(shadowJarTask)
+        group = "hytale"
+        description = "Builds the final .jar file for distribution"
+
+        val releaseFileProvider = shadowJarTask.flatMap { it.archiveFile }
+
+        doLast {
+            logger.lifecycle("===========================================")
+            logger.lifecycle(" Build Success!")
+            logger.lifecycle(" Release File: ${releaseFileProvider.get().asFile.absolutePath}")
+            logger.lifecycle("===========================================")
+        }
     }
 
-    val checkRequiredFiles by registering(DefaultTask::class) {
-        doLast {
-            val missingFiles = mutableListOf<String>()
-
-            if (!serverPath.exists()) {
-                missingFiles.add("HytaleServer.jar")
-            }
-            if (!assetsPath.exists()) {
-                missingFiles.add("Assets.zip")
-            }
-
-            if (missingFiles.isNotEmpty()) {
-                throw GradleException(
-                    "ERROR: The following required files are missing in ./libs/:\n" +
-                    missingFiles.joinToString("\n") { "  - $it" } +
-                    "\n\nPlease read README.md for instructions on how to obtain these files."
-                )
-            }
-        }
+    build {
+        dependsOn(buildRelease)
     }
 
     val setupRunFolder by registering(Copy::class) {
-        dependsOn(checkRequiredFiles)
+        val libsDir = rootProject.layout.projectDirectory.dir("libs")
+        val runDir = rootProject.layout.projectDirectory.dir("run")
 
-        from(serverPath) {
-            into(".")
-        }
-        from(assetsPath) {
-            into(".")
-        }
+        from(libsDir) { include("HytaleServer.jar", "Assets.zip") }
+        into(runDir)
 
-        into(runFolder)
-
-        onlyIf {
-            !runFolder.resolve("HytaleServer.jar").exists() || !runFolder.resolve("Assets.zip").exists()
-        }
+        onlyIf { !runDir.file("HytaleServer.jar").asFile.exists() }
     }
 
-    val copyMods by registering(Copy::class) {
-        dependsOn(shadowJar, setupRunFolder)
-        delete(modsFolder)
+    val installDevMod by registering {
+        dependsOn(setupRunFolder, "classes")
+        group = "hytale"
+        description = "Installs the mod as a folder with Symlinked resources"
 
-        from(shadowJar.get().archiveFile)
-        into(modsFolder)
+        doLast {
+            val runDir = rootProject.file("run")
+            val modsDir = runDir.resolve("mods")
+            val modDir = modsDir.resolve(rootProject.name)
+
+            val resourcesSrc = file("src/main/resources")
+            val classesSrc = sourceSets.main.get().output.classesDirs.singleFile
+
+            if (modDir.exists()) modDir.deleteRecursively()
+            modDir.mkdirs()
+
+            copy {
+                from(classesSrc)
+                into(modDir)
+            }
+
+            if (resourcesSrc.exists()) {
+                resourcesSrc.listFiles()?.forEach { file ->
+                    val target = modDir.resolve(file.name).toPath()
+                    try {
+                        Files.createSymbolicLink(target, file.toPath())
+                        logger.lifecycle("Symlinked: ${file.name}")
+                    } catch (e: Exception) {
+                        logger.warn("Could not symlink ${file.name}, copying instead.")
+                        copy { from(file); into(modDir) }
+                    }
+                }
+            }
+        }
     }
 
     val runServer by registering(JavaExec::class) {
-        dependsOn(copyMods)
-
+        dependsOn(installDevMod)
         group = "hytale"
-        description = "Runs the Hytale server with the plugin"
-        workingDir = runFolder
-        classpath = files(runFolder.resolve("HytaleServer.jar"))
-        args = listOf("--assets", "Assets.zip")
-        standardInput = System.`in`
+        description = "Runs the Hytale server"
 
+        val runDir = rootProject.file("run")
+        workingDir = runDir
+
+        classpath = files(runDir.resolve("HytaleServer.jar"))
+        args = listOf(
+            "--assets", "Assets.zip",
+            "--auth-mode", "offline",
+            //"--validate-assets", NEVER FUCKING ACTIVATE THIS SHIT
+            "--event-debug",
+            "--allow-op"
+        )
+        standardInput = System.`in`
         systemProperty("org.gradle.console", "plain")
     }
 }
