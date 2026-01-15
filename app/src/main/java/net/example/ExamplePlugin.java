@@ -25,15 +25,16 @@ public class ExamplePlugin extends JavaPlugin {
      * @param init the plugin initialization object (must not be null)
      * @throws NullPointerException if init is null
      */
-    public ExamplePlugin(JavaPluginInit init) {
+    public ExamplePlugin(JavaPluginInit init)
+    {
         super(init);
         instance = this;
         logger.atInfo().log("Plugin loaded!");
     }
 
-
     @Override
-    public void setup() {
+    public void setup()
+    {
         logger.atInfo().log("Plugin enabled! test4444");
         this.getCommandRegistry().registerCommand(new ItemCommand());
         this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, ExampleEvent::onPlayerReady);

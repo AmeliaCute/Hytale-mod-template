@@ -27,13 +27,10 @@ public class ItemCommand extends AbstractPlayerCommand {
                            @Nonnull PlayerRef playerRef,
                            @Nonnull World world) {
         Player player = store.getComponent(ref, Player.getComponentType());
-        if (player != null ){
+        if (player != null )
+        {
             ItemStack mainItem = player.getInventory().getItemInHand() ;
-            if (mainItem != null ){
-                double maxDurability = mainItem.getMaxDurability();
-
-                player.sendMessage(Message.raw(mainItem.toString()));
-            }
+            if (mainItem != null ) player.sendMessage(Message.raw(mainItem.toString()));
         }
     }
 }
