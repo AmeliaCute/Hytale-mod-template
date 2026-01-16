@@ -108,6 +108,101 @@ abstract class ProcessManifestTask : DefaultTask() {
     }
 }
 
+abstract class InstallDevAssetsTask : DefaultTask() {
+    @get:InputDirectory
+    @get:Optional
+    abstract val resourcesDir: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val assetsOutputDir: DirectoryProperty
+
+    @get:Input
+    abstract val assetPluginName: Property<String>
+
+    @get:Input
+    abstract val assetPluginVersion: Property<String>
+
+    @get:Input
+    abstract val assetPluginGroup: Property<String>
+
+    @get:Input
+    abstract val assetPluginDescription: Property<String>
+
+    @TaskAction
+    fun installAssets() {
+        val assetsDir = assetsOutputDir.asFile.get()
+        val resourcesSrc = resourcesDir.asFile.orNull
+
+        assetsDir.mkdirs()
+        
+        if (resourcesSrc == null || !resourcesSrc.exists()) {
+            logger.lifecycle("No resources folder found, skipping assets installation")
+            return
+        }
+
+        val manifestData = """
+        {
+            "Group": "${assetPluginGroup.get()}",
+            "Name": "assets",
+            "Version": "${assetPluginVersion.get()}",
+            "Description": "${assetPluginDescription.get()}",
+            "Authors": [],
+            "Website": "",
+            "Dependencies": {},
+            "OptionalDependencies": {},
+            "LoadBefore": {},
+            "DisabledByDefault": false,
+            "IncludesAssetPack": false,
+            "SubPlugins": []
+        }
+        """.trimIndent()
+
+        val assetsManifestFile = assetsDir.resolve("manifest.json")
+        assetsManifestFile.writeText(manifestData)
+        logger.lifecycle("Created assets manifest.json")
+
+        val commonSourceFolder = resourcesSrc.resolve("Common")
+        if (commonSourceFolder.exists() && commonSourceFolder.isDirectory) {
+            val commonTargetFolder = assetsDir.resolve("Common")
+            commonSourceFolder.copyRecursively(commonTargetFolder, overwrite = true)
+            logger.lifecycle("Copied folder: Common")
+        }
+
+        val serverSourceFolder = resourcesSrc.resolve("Server")
+        if (serverSourceFolder.exists() && serverSourceFolder.isDirectory) {
+            val serverTargetFolder = assetsDir.resolve("Server")
+            try {
+                Files.createSymbolicLink(serverTargetFolder.toPath(), serverSourceFolder.toPath())
+                logger.lifecycle("Symlinked folder: Server")
+            } catch (e: Exception) {
+                logger.warn("Could not symlink Server folder \n${e.message}")
+            }
+        }
+
+        logger.lifecycle("Assets installed to: ${assetsDir.absolutePath}")
+    }
+}
+
+abstract class InstallDevModTask : DefaultTask() {
+    @get:Input
+    abstract val modPluginName: Property<String>
+
+    init {
+        outputs.upToDateWhen { false }
+    }
+
+    @TaskAction
+    fun printSummary() {
+        logger.lifecycle("===========================================")
+        logger.lifecycle(" Dev Installation Complete!")
+        logger.lifecycle(" Code JAR: run/mods/${modPluginName.get()}-dev-code-only.jar")
+        logger.lifecycle("   - Contains: compiled classes")
+        logger.lifecycle(" Assets: run/mods/${modPluginName.get()}.assets/")
+        logger.lifecycle("   - Contains: all resources")
+        logger.lifecycle("===========================================")
+    }
+}
+
 tasks {
     val cleanMods by registering(Delete::class) {
         group = "hytale"
@@ -178,13 +273,18 @@ tasks {
     }
 
     val setupRunFolder by registering(Copy::class) {
-        val libsDir = rootProject.layout.projectDirectory.dir("libs")
-        val runDir = rootProject.layout.projectDirectory.dir("run")
-
-        from(libsDir) { include("HytaleServer.jar", "Assets.zip") }
+        group = "hytale"
+        description = "Copies HytaleServer.jar and Assets.zip to run directory"
+        
+        val runDir = rootProject.file("run")
+        
+        from(hytaleServerJar)
+        from(hytaleAssetsZip)
         into(runDir)
-
-        onlyIf { !runDir.file("HytaleServer.jar").asFile.exists() }
+        
+        doFirst {
+            runDir.mkdirs()
+        }
     }
 
     val installDevCode by registering(Jar::class) {
@@ -206,85 +306,26 @@ tasks {
         destinationDirectory.set(rootProject.file("run/mods"))
     }
 
-    val installDevAssets by registering {
+    val installDevAssets by registering(InstallDevAssetsTask::class) {
         dependsOn(setupRunFolder, "processResources")
         group = "hytale"
         description = "Installs assets as a symlinked folder"
 
-        val runDirPath = rootProject.file("run")
-        val resourcesSrcPath = file("src/main/resources")
-
-        doLast {
-            val runDir = runDirPath
-            val modsDir = runDir.resolve("mods")
-            val assetsDir = modsDir.resolve("${pluginName}.assets")
-
-            val resourcesSrc = resourcesSrcPath
-
-            assetsDir.mkdirs()
-            if (resourcesSrc.exists())
-            {
-                val manifestData = """
-                {
-                    "Group": "$pluginGroup",
-                    "Name": "assets",
-                    "Version": "$pluginVersion",
-                    "Description": "$pluginDescription",
-                    "Authors": [],
-                    "Website": "",
-                    "Dependencies": {},
-                    "OptionalDependencies": {},
-                    "LoadBefore": {},
-                    "DisabledByDefault": false,
-                    "IncludesAssetPack": false,
-                    "SubPlugins": []
-                }
-                """.trimIndent()
-
-                val assetsManifestFile = assetsDir.resolve("manifest.json")
-                assetsManifestFile.writeText(manifestData)
-                logger.lifecycle("Created assets manifest.json")
-
-                val commonSourceFolder = resourcesSrc.resolve("Common")
-                if (commonSourceFolder.exists() && commonSourceFolder.isDirectory) {
-                    val commonTargetFolder = assetsDir.resolve("Common")
-                    commonSourceFolder.copyRecursively(commonTargetFolder, overwrite = true)
-                    logger.lifecycle("Copied folder: Common")
-                }
-
-                val serverSourceFolder = resourcesSrc.resolve("Server")
-                if (serverSourceFolder.exists() && serverSourceFolder.isDirectory) {
-                    val serverTargetFolder = assetsDir.resolve("Server")
-                    try {
-                        Files.createSymbolicLink(serverTargetFolder.toPath(), serverSourceFolder.toPath())
-                        logger.lifecycle("Symlinked folder: Server")
-                    } catch (e: Exception) {
-                        logger.warn("Could not symlink Server folder \n${e.message}")
-                    }
-                }
-
-                logger.lifecycle("Assets installed to: ${assetsDir.absolutePath}")
-            } else
-            {
-                logger.lifecycle("No resources folder found, skipping assets installation")
-            }
-        }
+        resourcesDir.set(file("src/main/resources"))
+        assetsOutputDir.set(rootProject.file("run/mods/${pluginName}.assets"))
+        
+        assetPluginName.set(pluginName)
+        assetPluginVersion.set(pluginVersion)
+        assetPluginGroup.set(pluginGroup)
+        assetPluginDescription.set(pluginDescription)
     }
 
-    val installDevMod by registering {
+    val installDevMod by registering(InstallDevModTask::class) {
         dependsOn(installDevCode, installDevAssets)
         group = "hytale"
         description = "Installs dev mod (code JAR + symlinked assets folder)"
 
-        doLast {
-            logger.lifecycle("===========================================")
-            logger.lifecycle(" Dev Installation Complete!")
-            logger.lifecycle(" Code JAR: run/mods/${pluginName}-dev-code-only.jar")
-            logger.lifecycle("   - Contains: compiled classes")
-            logger.lifecycle(" Assets: run/mods/${pluginName}.assets/")
-            logger.lifecycle("   - Contains: all resources")
-            logger.lifecycle("===========================================")
-        }
+        modPluginName.set(pluginName)
     }
 
     val runServer by registering(JavaExec::class) {
