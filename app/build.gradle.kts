@@ -34,6 +34,12 @@ dependencies {
     implementation("com.google.guava:guava:33.4.6-jre")
 }
 
+tasks.jar{
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from("src/main/ressources")
+}
+
 tasks {
     val cleanMods by registering(Delete::class) {
         group = "hytale"
