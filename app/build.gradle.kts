@@ -16,11 +16,39 @@ java {
     targetCompatibility = JavaVersion.VERSION_25
 }
 
+val hytaleHome: String by lazy {
+    if (project.hasProperty("hytale_home")) {
+        project.findProperty("hytale_home") as String
+    } else {
+        val os = org.gradle.internal.os.OperatingSystem.current()
+        val userHome = System.getProperty("user.home")
+        when {
+            os.isWindows -> "$userHome/AppData/Roaming/Hytale"
+            os.isMacOsX -> "$userHome/Library/Application Support/Hytale"
+            os.isLinux -> {
+                val flatpakPath = "$userHome/.var/app/com.hypixel.HytaleLauncher/data/Hytale"
+                if (file(flatpakPath).exists()) flatpakPath
+                else "$userHome/.local/share/Hytale"
+            }
+            else -> throw GradleException("Unsupported operating system. Please define hytale_home property.")
+        }
+    }
+}
+
+val gamePatchline: String by project
+
+if (!file(hytaleHome).exists()) {
+    throw GradleException("Failed to find Hytale at $hytaleHome. Please install the game or set the hytale_home property.")
+}
+
 val pluginName: String by project
 val pluginVersion: String by project
 val pluginGroup: String by project
 val pluginDescription: String by project
 val pluginMain: String by project
+val hytaleServerJar = "$hytaleHome/install/$gamePatchline/package/game/latest/Server/HytaleServer.jar"
+val hytaleAssetsZip = "$hytaleHome/install/$gamePatchline/package/game/latest/Assets.zip"
+
 
 version = pluginVersion
 group = pluginGroup
@@ -29,8 +57,16 @@ repositories {
     mavenCentral()
 }
 
+if (!file(hytaleServerJar).exists()) {
+    throw GradleException("HytaleServer.jar not found at $hytaleServerJar")
+}
+
+if (!file(hytaleAssetsZip).exists()) {
+    throw GradleException("Assets.zip not found at $hytaleAssetsZip")
+}
+
 dependencies {
-    implementation(files("../libs/HytaleServer.jar"))
+    implementation(files(hytaleServerJar))
     implementation("com.google.guava:guava:33.4.6-jre")
 }
 
