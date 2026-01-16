@@ -1,0 +1,22 @@
+{
+  "Group": "$pluginGroup",
+  "Name": "$pluginName",
+  "Version": "$pluginVersion",
+  "Description": "$pluginDescription",
+  "Authors": [
+    {
+      "Name": "Love",
+      "Email": "mail@example.com",
+      "Url": "https://example.com"
+    }
+  ],
+  "Website": "example.amycute.xyz",
+  "Main": "$pluginMain",
+  "ServerVersion": "*",
+  "Dependencies": {},
+  "OptionalDependencies": {},
+  "LoadBefore": {},
+  "DisabledByDefault": false,
+  "IncludesAssetPack": true,
+  "SubPlugins": []
+}
