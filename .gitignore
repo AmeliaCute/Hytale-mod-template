@@ -59,4 +59,4 @@ desktop.ini
 HytaleServer.jar
 Assets.zip
 
-app/src/main/generated/manifest.json
+app/src/main/resources/manifest.json
