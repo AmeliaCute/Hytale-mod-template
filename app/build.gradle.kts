@@ -1,7 +1,7 @@
 import java.nio.file.Files
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import groovy.json.JsonBuilder
-import groovy.json.JsonSlurper
+import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.*
 
 plugins {
     id("java-library")
@@ -34,6 +34,44 @@ dependencies {
     implementation("com.google.guava:guava:33.4.6-jre")
 }
 
+abstract class ProcessManifestTask : DefaultTask() {
+    @get:InputFile
+    abstract val generatedManifest: RegularFileProperty
+
+    @get:OutputFile
+    abstract val resourcesManifest: RegularFileProperty
+
+    @get:Input
+    abstract val variables: MapProperty<String, String>
+
+    @TaskAction
+    fun processManifest() {
+        val inputFile = generatedManifest.asFile.get()
+        val outputFile = resourcesManifest.asFile.get()
+
+        if (!inputFile.exists()) {
+            throw GradleException("Source manifest not found at ${inputFile.absolutePath}")
+        }
+
+        val manifestText = inputFile.readText()
+        val processedText = processJsonVariables(manifestText, variables.get())
+
+        outputFile.parentFile.mkdirs()
+        outputFile.writeText(processedText)
+
+        logger.lifecycle("Processed manifest.json: generated/ -> src/main/resources/")
+    }
+
+    private fun processJsonVariables(jsonText: String, vars: Map<String, String>): String {
+        var result = jsonText
+        vars.forEach { (key, value) ->
+            result = result.replace("\$$key", value)
+            result = result.replace("\${$key}", value)
+        }
+        return result
+    }
+}
+
 tasks {
     val cleanMods by registering(Delete::class) {
         group = "hytale"
@@ -54,39 +92,19 @@ tasks {
         enabled = false
     }
 
-    val processManifest by registering {
+    val processManifest by registering(ProcessManifestTask::class) {
         group = "hytale"
         description = "Processes manifest.json from generated/ and copies to resources/"
 
-        val generatedManifestFile = file("src/main/generated/manifest.json")
-        val resourcesManifestFile = file("src/main/resources/manifest.json")
-
-        inputs.file(generatedManifestFile)
-        outputs.file(resourcesManifestFile)
-
-        doLast {
-            if (!generatedManifestFile.exists()) {
-                throw GradleException("Source manifest not found at ${generatedManifestFile.absolutePath}")
-            }
-
-            val slurper = JsonSlurper()
-            val manifestJson = slurper.parse(generatedManifestFile) as Map<String, Any>
-
-            val processedManifest = processJsonVariables(manifestJson, mapOf(
-                "pluginName" to pluginName,
-                "pluginVersion" to pluginVersion,
-                "pluginGroup" to pluginGroup,
-                "pluginDescription" to pluginDescription,
-                "pluginMain" to pluginMain
-            ))
-
-            resourcesManifestFile.parentFile.mkdirs()
-
-            val jsonBuilder = JsonBuilder(processedManifest)
-            resourcesManifestFile.writeText(jsonBuilder.toPrettyString())
-
-            logger.lifecycle("Processed manifest.json: generated/ -> src/main/resources/")
-        }
+        generatedManifest.set(file("src/main/generated/manifest.json"))
+        resourcesManifest.set(file("src/main/resources/manifest.json"))
+        variables.set(mapOf(
+            "pluginName" to pluginName,
+            "pluginVersion" to pluginVersion,
+            "pluginGroup" to pluginGroup,
+            "pluginDescription" to pluginDescription,
+            "pluginMain" to pluginMain
+        ))
     }
 
     processResources {
@@ -170,25 +188,25 @@ tasks {
             assetsDir.mkdirs()
             if (resourcesSrc.exists())
             {
-                val manifestData = mapOf(
-                    "Group" to pluginGroup,
-                    "Name" to "assets",
-                    "Version" to pluginVersion,
-                    "Description" to pluginDescription,
-                    "Authors" to emptyList<String>(),
-                    "Website" to "",
-                    "Dependencies" to emptyMap<String, String>(),
-                    "OptionalDependencies" to emptyMap<String, String>(),
-                    "LoadBefore" to emptyMap<String, String>(),
-                    "DisabledByDefault" to false,
-                    "IncludesAssetPack" to false,
-                    "SubPlugins" to emptyList<String>()
-                )
+                val manifestData = """
+                {
+                    "Group": "$pluginGroup",
+                    "Name": "assets",
+                    "Version": "$pluginVersion",
+                    "Description": "$pluginDescription",
+                    "Authors": [],
+                    "Website": "",
+                    "Dependencies": {},
+                    "OptionalDependencies": {},
+                    "LoadBefore": {},
+                    "DisabledByDefault": false,
+                    "IncludesAssetPack": false,
+                    "SubPlugins": []
+                }
+                """.trimIndent()
 
-                val assetsManifest = manifestData.toMutableMap()
                 val assetsManifestFile = assetsDir.resolve("manifest.json")
-                val jsonBuilder = JsonBuilder(assetsManifest)
-                assetsManifestFile.writeText(jsonBuilder.toPrettyString())
+                assetsManifestFile.writeText(manifestData)
                 logger.lifecycle("Created assets manifest.json")
 
                 val commonSourceFolder = resourcesSrc.resolve("Common")
@@ -249,27 +267,5 @@ tasks {
         )
         standardInput = System.`in`
         systemProperty("org.gradle.console", "plain")
-    }
-}
-
-fun processJsonVariables(obj: Any?, variables: Map<String, String>): Any? {
-    return when (obj) {
-        is Map<*, *> -> {
-            obj.entries.associate { (key, value) ->
-                key to processJsonVariables(value, variables)
-            }
-        }
-        is List<*> -> {
-            obj.map { processJsonVariables(it, variables) }
-        }
-        is String -> {
-            var result: String = obj
-            variables.forEach { (varKey, varValue) ->
-                result = result.replace("\$$varKey", varValue)
-                result = result.replace("\${$varKey}", varValue)
-            }
-            result
-        }
-        else -> obj
     }
 }
