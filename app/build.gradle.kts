@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly(files("../libs/HytaleServer.jar"))
+    implementation(files("../libs/HytaleServer.jar"))
     implementation("com.google.guava:guava:33.4.6-jre")
 }
 
