@@ -66,8 +66,7 @@ if (!file(hytaleAssetsZip).exists()) {
 }
 
 dependencies {
-    implementation(files(hytaleServerJar))
-    implementation("com.google.guava:guava:33.4.6-jre")
+    compileOnly(files(hytaleServerJar))
 }
 
 abstract class ProcessManifestTask : DefaultTask() {
@@ -134,7 +133,7 @@ abstract class InstallDevAssetsTask : DefaultTask() {
         val resourcesSrc = resourcesDir.asFile.orNull
 
         assetsDir.mkdirs()
-        
+
         if (resourcesSrc == null || !resourcesSrc.exists()) {
             logger.lifecycle("No resources folder found, skipping assets installation")
             return
@@ -275,13 +274,13 @@ tasks {
     val setupRunFolder by registering(Copy::class) {
         group = "hytale"
         description = "Copies HytaleServer.jar and Assets.zip to run directory"
-        
+
         val runDir = rootProject.file("run")
-        
+
         from(hytaleServerJar)
         from(hytaleAssetsZip)
         into(runDir)
-        
+
         doFirst {
             runDir.mkdirs()
         }
@@ -313,7 +312,7 @@ tasks {
 
         resourcesDir.set(file("src/main/resources"))
         assetsOutputDir.set(rootProject.file("run/mods/${pluginName}.assets"))
-        
+
         assetPluginName.set(pluginName)
         assetPluginVersion.set(pluginVersion)
         assetPluginGroup.set(pluginGroup)
